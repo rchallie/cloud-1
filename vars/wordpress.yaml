@@ -1,0 +1,11 @@
+env_base_path: fake_env/wp
+dockerfiles_src_dir: docker_files/wordpress
+
+wordpress_build:
+  build_dir: "{{ env_base_path }}/wordpress_build_dir"
+  source: "{{ dockerfiles_src_dir }}/"
+  image_name: wordpress_cloud_one
+  container_name: wordpress_cloude_one
+  owner: rchallie
+  group: rchallie
+  www_path: /www

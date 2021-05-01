@@ -1,0 +1,36 @@
+---
+- hosts: localhost
+  connection: local
+  tasks:
+    - name: "[WORDPRESS] Import file variable"
+      include_vars: wordpress.yaml
+    - name: "[WORDPRESS] Create wordpress build directory"
+      file:
+        path: "{{ wordpress_build.build_dir }}"
+        state: directory
+        owner: "{{ wordpress_build.owner }}"
+        group: "{{ wordpress_build.group }}"
+        mode: '0755'
+    - name: "[WORDPRESS] Copy wordpress files (Dockerfile, configuration files...)"
+      copy:
+        src: "{{ wordpress_build.source }}"
+        dest: "{{ wordpress_build.build_dir }}"
+        owner: "{{ wordpress_build.owner }}"
+        group: "{{ wordpress_build.group }}"
+        directory_mode: yes
+        mode: '0644'
+    - name: "[WORDPRESS] Build wordpress image"
+      docker_image:
+        force_source: yes
+        name: "{{ wordpress_build.image_name }}"
+        build:
+          path: "{{ wordpress_build.build_dir }}"
+          args:
+            WWW_PATH: "{{ wordpress_build.www_path }}" 
+        source: build
+    - name: "[WORDPRESS] Start wordpress container"
+      docker_container:
+        name: "{{ wordpress_build.container_name }}"
+        image: "{{ wordpress_build.image_name }}"
+        ports:
+          - "8080:80"
